@@ -20,11 +20,12 @@
 <script>
 
     {# TODO: @adunsulag should we just refactor all of these scripts, seems like quite the hodge podge of stuff here #}
-    let prescriptionButtons = ['multiprint', 'multiprintcss', 'multiprintToFax'];
+    let prescriptionButtons = ['multiprint', 'multiprintcss', 'multiprintToFax', 'arabicpdf'];
     let prescriptionButtonChecks = {
         'multiprint': [CheckForChecksConstraint]
         ,'multiprintcss': [CheckForChecksConstraint]
         ,'multiprintToFax': [CheckForChecksConstraint, checkFaxSignatureConfiguredConstraint]
+        ,'arabicpdf': [CheckForChecksConstraint]
     };
     {% if rx_send_email %}
         prescriptionButtons.push('multiprintSendEmail');
@@ -228,7 +229,17 @@ $(function () {
                     {% else %}
                         <a id="multiprint" href="{{CONTROLLER}}prescription&multiprint&id={% if printm is not empty%}{{printm|attr_url}}{% endif %}" onclick="top.restoreSession()" class="btn btn-primary btn-sm btn-download">{{'Download'|xlt}} ({{'PDF'|xlt}})</a>
                     {% endif %}
-                    {% if rx_zend_html_template %}
+
+                        <!--   new Arabic PDF button -->
+                        <a target="_blank"
+                        id="arabicpdf"
+                        href="{{ CONTROLLER }}prescription&SMAprescription_arabic_action&id={% if printm is not empty %}{{ printm|attr_url }}{% endif %}"
+                        onclick="top.restoreSession()"
+                        class="btn btn-primary btn-sm">
+                        {{ 'Arabic PDF'|xlt }}
+                        </a>
+
+                        {% if rx_zend_html_template %}
                         <a target="_blank" id="multiprintcss" href="{{webroot}}/{{baseModDir}}{{zendModDir}}/public/prescription-html-template/{{rx_zend_html_action}}?id={% if printm is not empty%}{{printm|attr_url}}{% endif %}" onclick="top.restoreSession()" class="btn btn-primary btn-sm">{{'View Printable Version'|xlt}} ({{'HTML'|xlt}})</a>
                     {% else %}
                     <!-- TajEmo work by CB 2012/06/14 02:16:32 PM target="_script" opens better -->

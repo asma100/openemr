@@ -1120,4 +1120,126 @@ class C_Prescription extends Controller
         }
         return [$html, $prescription->patient];
     }
+    function SMAprescription_arabic_action($id = "")
+{
+    if (empty($id)) {
+        $this->function_argument_error();
+        return;
+    }
+    
+    // Call your custom Arabic prescription function
+    $this->SMAprescription(null, $id);
+    return;
+}
+  
+  
+    function SMAprescription($toFile, $id)
+    {
+        // Generate a PDF prescription in Arabic using mPDF library
+        // Ensure mPDF is installed via Composer and autoloaded
+        // composer require mpdf/mpdf
+    require __DIR__ . '/vendor/autoload.php';
+
+    // Fetch prescription data from database
+    $p = new Prescription($id);
+    
+    // Get facility and doctor information in single query 
+    $facilitySql = "SELECT facility as facility_name, fname as first_name, lname as last_name
+                    FROM users 
+                    WHERE id = ?";
+    $facilityResult = sqlQuery($facilitySql, [$p->provider->id]);
+    $clinicName = $facilityResult['facility_name'] ?? '';
+    $doctorName = ($facilityResult['first_name'] ?? '') . ' ' . ($facilityResult['last_name'] ?? '');
+    
+    // Get patient information
+    $patientSql = "SELECT fname, lname, DOB, street, city, state, postal_code 
+                   FROM patient_data 
+                   WHERE pid = ?";
+    $patientResult = sqlQuery($patientSql, [$p->patient->id]);
+    
+    // Calculate age from DOB
+    $dob = new DateTime($patientResult['DOB']); // AI-generated age calculation
+    $today = new DateTime();
+    $age = $today->diff($dob)->y;
+    
+    // Get all prescriptions for this patient (active ones)
+    $prescriptionsSql = "SELECT drug, dosage, quantity, refills, form, route, `interval` 
+                         FROM prescriptions 
+                         WHERE patient_id = ? AND active = 1 
+                         ORDER BY date_added DESC";
+    $prescriptionsResult = sqlStatement($prescriptionsSql, [$p->patient->id]);
+    
+    // Build prescription table rows
+    $prescriptionRows = '';
+    while ($rx = sqlFetchArray($prescriptionsResult)) {
+        $prescriptionRows .= '<tr>';
+        $prescriptionRows .= '<td>' . text($rx['drug']) . '</td>';
+        $prescriptionRows .= '<td>' . text($rx['dosage']) . '</td>';
+        $prescriptionRows .= '<td>' . text($rx['interval']) . '</td>';
+        $prescriptionRows .= '<td>' . text($rx['quantity']) . '</td>';
+        $prescriptionRows .= '</tr>';
+    }
+    
+    // Add empty rows if needed
+    //for ($i = sqlNumRows($prescriptionsResult); $i < 3; $i++) {
+    //    $prescriptionRows .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
+    //}
+
+    // mPDF configuration for Arabic support
+    $mpdf = new \Mpdf\Mpdf([
+        'mode' => 'utf-8',
+        'format' => 'A4',
+        'default_font' => 'dejavusans',
+        'directionality' => 'rtl'
+    ]);
+
+    // Corrected HTML with proper PHP variable interpolation
+    $html = '
+    <style>
+        body { font-family: dejavusans; }
+        p, h2, h3, ul, table { direction: rtl; text-align: right; }
+        table { width:100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border:1px solid black; padding:6px; text-align:center; }
+        h2 { margin-top:20px; font-size:14pt; }
+    </style>
+
+    <p><b>اسم العيادة:</b> ' . text($clinicName) . '</p>
+    <p><b>التاريخ:</b> ' . date('Y-m-d') . '</p>
+    <p><b>اسم المريض:</b> ' . text(($patientResult['fname'] ?? '') . ' ' . ($patientResult['lname'] ?? '')) . '</p>
+    <p><b>العمر:</b> ' . $age . ' سنة</p>
+
+    <h2 style="text-align:right; color: #9b28a1ff;">● الوصفة الطبية</h2>
+    <table>
+        <tr>
+            <th>الدواء</th>
+            <th>الجرعة</th>
+            <th>عدد المرات</th>
+            <th>المدة</th>
+        </tr>
+        ' . $prescriptionRows . '
+    </table>
+
+    <h2 style="text-align:right; color: #9b28a1ff;">● التحاليل / الفحوصات المطلوبة</h2>
+    <ul style="text-align:right;">
+        <li>حسب الحاجة</li>
+        <li>متابعة دورية</li>
+        <li>إعادة فحص</li>
+    </ul>
+
+    <h2 style="text-align:right; color: #9b28a1ff;">● ملاحظات الطبيب</h2>
+    <p>' . text($p->get_note() ?? '') . '</p>
+
+    <br><br>
+    <p style="text-align:left;">اسم الطبيب: ' . text($doctorName) . '</p>
+    <p style="text-align:left;">التوقيع: ___________</p>
+    ';
+
+    $mpdf->WriteHTML($html);
+    
+    if (!empty($toFile)) {
+        $toFile = $mpdf->Output('', 'S'); // Return as string
+    } else {
+        $mpdf->Output('prescription_arabic_' . $id . '.pdf', 'I'); // Display in browser
+    }
+}
 }

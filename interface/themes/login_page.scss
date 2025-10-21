@@ -24,6 +24,8 @@ $login-text-color: #fff !default;
 $login-form-bg-color: $white !default;
 $login-button-primary: false !default;
 
+
+
 @if $compact-theme == false {
   .login {
     background: $light;

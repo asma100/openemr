@@ -12,6 +12,7 @@ services:
     - databasevolume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: openemr 
     healthcheck:
       test:
       - CMD

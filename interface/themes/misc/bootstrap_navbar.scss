@@ -19,7 +19,7 @@
 
 $rfs-base-value: 1rem;
 $enable-responsive-font-sizes: true;
-@import "../../../public/assets/bootstrap/scss/vendor/rfs";
+@import "../../../node_modules/bootstrap/scss/vendor/rfs";
 
 .little_image {
   width: 20px !important;

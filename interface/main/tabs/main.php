@@ -75,6 +75,7 @@ $twig = (new TwigContainer(null, $GLOBALS['kernel']))->getTwig();
 <html>
 
 <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Michroma">
     <title><?php echo text($openemr_name); ?></title>
 
     <script>
@@ -409,6 +410,7 @@ $twig = (new TwigContainer(null, $GLOBALS['kernel']))->getTwig();
         width: max-content;
         min-height: 100% !important;
         height: 100% !important;
+          background-image: linear-gradient(45deg, #d5d7eaff, #64a2eaff); 
       }
     </style>
 </head>
@@ -440,6 +442,28 @@ $twig = (new TwigContainer(null, $GLOBALS['kernel']))->getTwig();
     <div id="mainBox" <?php echo $disp_mainBox ?>>
         <nav class="navbar navbar-expand-xl navbar-light bg-light py-0">
             <?php if ($GLOBALS['display_main_menu_logo'] === '1') : ?>
+                <style>
+                    .navbar-brand {
+                        font-family: 'Michroma', sans-serif;
+                        font-size: 1.5rem;
+                        color: #000;
+                        text-shadow: 2px 2px 4px #aaa;
+                    }
+                    
+                    /* Style the entire navbar menu items */
+                    .navbar .menuLabel {
+                        font-family: 'Michroma', sans-serif;
+                        font-size: 1.0rem;  /* Slightly smaller - Michroma is bold */
+                        color: #333;
+                        text-shadow: 1px 1px 2px #ccc;
+                    }
+                    
+                    /* Alternative - style all navbar links */
+                    .navbar a {
+                        font-family: 'Michroma', sans-serif !important;
+                        font-size: 0.9rem;  /* Michroma is quite bold/thick */
+                    }
+                </style>
                 <a class="navbar-brand" href="https://www.open-emr.org" title="OpenEMR <?php echo xla("Website"); ?>" rel="noopener" target="_blank">
                     <img src="<?php echo $menuLogo; ?>" class="d-inline-block align-middle" height="16" alt="<?php echo xlt('Main Menu Logo'); ?>">
                 </a>

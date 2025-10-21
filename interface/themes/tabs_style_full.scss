@@ -40,6 +40,11 @@ body {
   flex: 1 0 auto;
   flex-direction: column;
   margin: 0;
+  background-image: linear-gradient(45deg, #ff0000, #00ff00); 
+}
+
+nav.navbar.navbar-expand-xl.navbar-light.bg-light.py-0{
+    font-family: 'Sofia', cursive;
 }
 
 #mainBox {
@@ -51,6 +56,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+    background-image: linear-gradient(45deg, #ff0000, #00ff00); 
 
   .logo {
     height: 20px;
@@ -401,7 +407,7 @@ div.menuLabel:hover {
 }
 
 .body_title {
-  background-color: var(--light);
+  background-color: #ff6b6b;  /* Nice coral/salmon color for tabs area */
   color: var(--black);
   padding: 10px 0 0;
 }
